@@ -9,22 +9,37 @@ document.addEventListener('DOMContentLoaded', function() {
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-menu a');
 
-    if (navToggle) {
+    if (navToggle && navMenu) {
+        function setMenuOpen(open) {
+            navToggle.classList.toggle('active', open);
+            navMenu.classList.toggle('active', open);
+            document.body.classList.toggle('nav-open', open);
+            navToggle.setAttribute('aria-expanded', String(open));
+        }
+
         navToggle.addEventListener('click', function() {
-            this.classList.toggle('active');
-            navMenu.classList.toggle('active');
-            document.body.classList.toggle('nav-open');
+            setMenuOpen(!navMenu.classList.contains('active'));
+        });
+
+        // Close mobile menu when clicking a link.
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                setMenuOpen(false);
+            });
+        });
+
+        // Reset mobile state when switching to the desktop navigation.
+        window.addEventListener('resize', function() {
+            if (window.innerWidth >= 768) setMenuOpen(false);
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && navMenu.classList.contains('active')) {
+                setMenuOpen(false);
+                navToggle.focus();
+            }
         });
     }
-
-    // Close mobile menu when clicking a link
-    navLinks.forEach(link => {
-        link.addEventListener('click', function() {
-            navToggle.classList.remove('active');
-            navMenu.classList.remove('active');
-            document.body.classList.remove('nav-open');
-        });
-    });
 
     // Navbar scroll effect
     const navbar = document.querySelector('.navbar');
@@ -208,33 +223,4 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('%c Lauren Koenig Speaker Website ', 'background: #e94560; color: white; padding: 4px 8px; border-radius: 4px;');
     console.log('%c Ready for your next event! ', 'background: #1a1a2e; color: white; padding: 4px 8px; border-radius: 4px;');
-});
-
-// Handle window resize (close mobile menu on desktop)
-window.addEventListener('resize', function() {
-    if (window.innerWidth >= 768) {
-        const navToggle = document.querySelector('.nav-toggle');
-        const navMenu = document.querySelector('.nav-menu');
-        
-        if (navToggle && navMenu) {
-            navToggle.classList.remove('active');
-            navMenu.classList.remove('active');
-            document.body.classList.remove('nav-open');
-        }
-    }
-});
-
-// Keyboard navigation for accessibility
-document.addEventListener('keydown', function(e) {
-    // Escape key closes mobile menu
-    if (e.key === 'Escape') {
-        const navToggle = document.querySelector('.nav-toggle');
-        const navMenu = document.querySelector('.nav-menu');
-        
-        if (navToggle && navMenu.classList.contains('active')) {
-            navToggle.classList.remove('active');
-            navMenu.classList.remove('active');
-            document.body.classList.remove('nav-open');
-        }
-    }
 });
